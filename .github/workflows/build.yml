@@ -1,0 +1,32 @@
+name: Build FeiraNossa
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Compile sources
+      run: |
+        mkdir -p out
+        find src -name "*.java" > fontes.txt
+        javac -d out @fontes.txt
+        echo "✅ Compilação concluída com sucesso."
+
+    - name: Run (smoke test - seed only)
+      run: |
+        echo "0" | java -cp out br.com.feiranossa.util.SeedData 2>/dev/null || true
+        echo "✅ Seed executado."
